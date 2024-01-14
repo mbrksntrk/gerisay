@@ -15,6 +15,7 @@ class CountdownApp:
         master.bind("<B1-Motion>", self.on_move)
 
         self.state = False
+        self.pause = False
         self.total_time = 0
 
         self.timer_label = ttk.Label(master, text="00:00:00", font=("default", 40))
@@ -66,23 +67,37 @@ class CountdownApp:
         y = self.master.winfo_y() + deltay
         self.master.geometry(f"+{x}+{y}")
 
+    def pause_(self):
+        if self.state and not self.pause:
+            self.pause = True
+            self.start_button.config(text="Continue")
+
     def start(self):
-        if not self.state:
+        if self.pause:
+            self.pause = False
+            self.start_button.config(text="Pause")
+            self.master.after(1000, self.countdown)
+        elif not self.state:
             time_string = f"{self.time_entry_hour.get()}:{self.time_entry_minute.get()}:{self.time_entry_second.get()}"
             self.total_time = self.time_string_to_seconds(time_string)
             self.state = True
+            self.start_button.config(text="Pause")
             self.master.after(1000, self.countdown)
+        else:
+            self.pause_()
 
     def stop(self):
         self.state = False
+        self.pause = False
+        self.total_time = 0
+        self.timer_label.config(text="00:00:00")
+        self.start_button.config(text="Start")
 
     def countdown(self):
-        if self.state and self.total_time > 0:
+        if self.state and not self.pause and self.total_time > 0:
             self.total_time -= 1
             self.timer_label.config(text=self.seconds_to_time_string(self.total_time))
             self.master.after(1000, self.countdown)
-        else:
-            self.state = False
 
     def time_string_to_seconds(self, time_string):
         hours, minutes, seconds = map(int, time_string.split(":"))
