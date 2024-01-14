@@ -20,7 +20,7 @@ This is a simple countdown timer application built with Python and Tkinter.
 ## Usage
 
 1. Clone the repository.
-2. Run `main.py`.
+2. Run `gerisay.py`.
 
 ## License
 
